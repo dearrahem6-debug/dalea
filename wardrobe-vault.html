@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خزانتي الذكية | Wardrobe Vault</title>
+
+    <!-- تحميل الخط بشكل غير معيق للصفحة -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
+          rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    </noscript>
+
+    <style>
+        :root {
+            --bg-dark:   #09090f;
+            --card-bg:   #12121e;
+            --text-main: #f8fafc;
+            --text-muted:#94a3b8;
+            --neon-1:    #ff007f;
+            --neon-2:    #7928ca;
+            --neon-3:    #00d2ff;
+            --neon-4:    #00ff87;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(121,40,202,.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(0,210,255,.15)  0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 25px 15px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== الإطار المتحرك — بديل متوافق مع كل المتصفحات ===== */
+        .signature-frame {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 35px;
+            z-index: 1;
+        }
+
+        /* wrapper دوّار يحمل الحدود — بديل @property */
+        .signature-frame::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 27px;
+            background: linear-gradient(135deg,
+                var(--neon-1), var(--neon-2),
+                var(--neon-3), var(--neon-4),
+                var(--neon-1));
+            background-size: 400% 400%;
+            z-index: -1;
+            animation: gradientShift 4s linear infinite;
+        }
+
+        .signature-frame::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 27px;
+            background: linear-gradient(135deg,
+                var(--neon-1), var(--neon-2),
+                var(--neon-3), var(--neon-4),
+                var(--neon-1));
+            background-size: 400% 400%;
+            z-index: -2;
+            filter: blur(16px);
+            opacity: 0.6;
+            animation: gradientShift 4s linear infinite;
+        }
+
+        @keyframes gradientShift {
+            0%   { background-position: 0%   50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0%   50%; }
+        }
+
+        /* ===== Header ===== */
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .logo-area h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #ff007f, #00d2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-area p { color: var(--text-muted); font-size: .9rem; }
+
+        .stats-bar { display: flex; gap: 15px; flex-wrap: wrap; }
+
+        .stat-pill {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.1);
+            padding: 10px 18px;
+            border-radius: 14px;
+            text-align: center;
+        }
+
+        .stat-pill span {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--neon-3);
+        }
+
+        .stat-pill small { color: var(--text-muted); font-size: .8rem; }
+
+        /* ===== نموذج الإضافة ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: .85rem;
+            color: var(--text-muted);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 12px;
+            color: white;
+            font-size: .95rem;
+            outline: none;
+            transition: .3s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--neon-3);
+            box-shadow: 0 0 12px rgba(0,210,255,.25);
+        }
+
+        select option { background: #1a1a2e; }
+
+        input[type="color"] { padding: 4px; height: 46px; cursor: pointer; }
+        input[type="file"]  { padding: 10px 12px; cursor: pointer; }
+
+        .btn-glow {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--neon-1), var(--neon-2));
+            box-shadow: 0 4px 15px rgba(255,0,127,.4);
+            transition: transform .2s, box-shadow .2s;
+            height: 46px;
+            width: 100%;
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255,0,127,.65);
+        }
+
+        /* ===== شريط البحث والفلترة ===== */
+        .controls-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            justify-content: space-between;
+        }
+
+        .search-box { flex: 1; min-width: 250px; }
+
+        .filter-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .filter-btn {
+            background: #161625;
+            border: 1px solid rgba(255,255,255,.1);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: .3s;
+            font-family: inherit;
+            font-size: .9rem;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: rgba(0,210,255,.15);
+            border-color: var(--neon-3);
+            color: white;
+        }
+
+        .btn-outfit {
+            background: linear-gradient(135deg, #00d2ff, #00ff87);
+            color: #09090f;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .3s;
+            font-family: inherit;
+            font-size: .9rem;
+        }
+
+        .btn-outfit:hover { filter: brightness(1.1); transform: scale(1.03); }
+
+        /* ===== شبكة البطاقات ===== */
+        .clothes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 24px;
+        }
+
+        .cloth-card {
+            position: relative;
+            background: #141422;
+            border-radius: 20px;
+            padding: 18px;
+            transition: transform .3s ease;
+            animation: fadeInUp .35s ease both;
+            /* إصلاح: isolation يضمن ظهور ::before داخل حدود الكارت */
+            isolation: isolate;
+        }
+
+        .cloth-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 22px;
+            background: linear-gradient(135deg,
+                rgba(255,0,127,.6),
+                rgba(0,210,255,.6));
+            z-index: -1;
+            opacity: .45;
+            transition: opacity .3s ease;
+        }
+
+        .cloth-card:hover { transform: translateY(-6px); }
+
+        .cloth-card:hover::before {
+            opacity: 1;
+            box-shadow: 0 0 20px rgba(0,210,255,.4);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .card-img-placeholder {
+            width: 100%;
+            height: 180px;
+            border-radius: 14px;
+            margin-bottom: 14px;
+            background: #1e1e30;
+            border: 1px dashed rgba(255,255,255,.12);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: .85rem;
+        }
+
+        .placeholder-icon { font-size: 2.5rem; opacity: .5; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-title { font-size: 1.1rem; font-weight: 700; }
+
+        .color-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 8px rgba(255,255,255,.4);
+            flex-shrink: 0;
+        }
+
+        .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+
+        .badge {
+            font-size: .78rem;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.06);
+            color: #e2e8f0;
+        }
+
+        .location-box {
+            background: rgba(0,210,255,.08);
+            border-right: 3px solid var(--neon-3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: .85rem;
+            margin-bottom: 14px;
+            color: #bae6fd;
+        }
+
+        .card-actions { display: flex; gap: 8px; }
+
+        .btn-status {
+            flex: 1;
+            padding: 8px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: .82rem;
+            transition: .2s;
+            font-family: inherit;
+        }
+
+        .btn-status:hover { filter: brightness(1.2); transform: scale(1.03); }
+
+        .status-ready  { background: rgba(0,255,135,.18);  color: #00ff87; }
+        .status-wash   { background: rgba(255,170,0,.18);  color: #ffaa00; }
+        .status-stored { background: rgba(148,163,184,.18);color: #cbd5e1; }
+
+        .btn-delete {
+            background: rgba(255,0,85,.15);
+            color: #ff4d88;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: .2s;
+            font-size: 1rem;
+        }
+
+        .btn-delete:hover { background: #ff0055; color: white; }
+
+        /* ===== رسالة الفراغ ===== */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon { font-size: 4rem; margin-bottom: 15px; opacity: .5; }
+        .empty-state p { font-size: 1.1rem; }
+
+        /* ===== نافذة الطقم ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.8);
+            backdrop-filter: blur(6px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show { display: flex; }
+
+        .modal-content {
+            background: #12121e;
+            border: 2px solid var(--neon-3);
+            box-shadow: 0 0 35px rgba(0,210,255,.4);
+            border-radius: 22px;
+            padding: 28px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .outfit-item {
+            background: rgba(255,255,255,.05);
+            padding: 12px;
+            border-radius: 12px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right;
+        }
+
+        .outfit-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid white;
+            flex-shrink: 0;
+            /* إصلاح: RTL — الهامش يجب أن يكون على اليسار */
+            margin-left: 10px;
+            margin-right: 0;
+        }
+
+        .outfit-no-items { color: var(--text-muted); padding: 20px; font-size: .95rem; }
+
+        /* إصلاح: زر الـ modal كامل العرض عبر CSS */
+        .btn-glow-full {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 600px) {
+            .logo-area h1   { font-size: 1.5rem; }
+            .controls-bar   { flex-direction: column; }
+            .filter-btns    { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="signature-frame">
+        <header>
+            <div class="logo-area">
+                <h1>✨ خزانتي الذكية</h1>
+                <p>نظام إدارة وتخزين الملابس — قاعدة بيانات محلية دائمة (IndexedDB)</p>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-pill">
+                    <span id="stat-total">0</span>
+                    <small>إجمالي القطع</small>
+                </div>
+                <div class="stat-pill">
+                    <span id="stat-ready" style="color:#00ff87">0</span>
+                    <small>جاهز للارتداء</small>
+                </div>
+                <div class="stat-pill">
+                    <span id="stat-wash" style="color:#ffaa00">0</span>
+                    <small>في الغسيل</small>
+                </div>
+                <div class="stat-pill">
+                    <span id="stat-stored" style="color:#94a3b8">0</span>
+                    <small>مخزن</small>
+                </div>
+            </div>
+        </header>
+
+        <form id="clothForm" class="form-grid">
+            <div class="input-group">
+                <label>اسم القطعة</label>
+                <input type="text" id="name" placeholder="مثال: قميص أبيض رسمي" required>
+            </div>
+            <div class="input-group">
+                <label>التصنيف</label>
+                <select id="category">
+                    <option value="علوي">ملابس علوية (قميص / تيشيرت)</option>
+                    <option value="سفلي">ملابس سفلية (بنطلون / تنورة)</option>
+                    <option value="معاطف">معاطف وجاكيتات</option>
+                    <option value="أحذية">أحذية</option>
+                    <option value="إكسسوارات">إكسسوارات وحقائب</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>الموسم</label>
+                <select id="season">
+                    <option value="كل المواسم">كل المواسم</option>
+                    <option value="صيفي">صيفي</option>
+                    <option value="شتوي">شتوي</option>
+                    <option value="ربيعي/خريفي">ربيعي / خريفي</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>مكان التخزين الدقيق</label>
+                <input type="text" id="location" placeholder="مثال: الرف الثاني - يمين" required>
+            </div>
+            <div class="input-group">
+                <label>اللون</label>
+                <input type="color" id="color" value="#00d2ff">
+            </div>
+            <div class="input-group">
+                <label>صورة القطعة (اختياري)</label>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
+            <button type="submit" class="btn-glow">+ حفظ في الخزانة</button>
+        </form>
+    </div>
+
+    <!-- شريط البحث والفلترة -->
+    <div class="controls-bar">
+        <div class="search-box">
+            <input type="text" id="searchInput"
+                   placeholder="🔍 ابحثي بالاسم أو مكان التخزين...">
+        </div>
+        <div class="filter-btns">
+            <button class="filter-btn active" onclick="setFilter('الكل',this)">الكل</button>
+            <button class="filter-btn" onclick="setFilter('علوي',this)">علوي</button>
+            <button class="filter-btn" onclick="setFilter('سفلي',this)">سفلي</button>
+            <button class="filter-btn" onclick="setFilter('معاطف',this)">معاطف</button>
+            <button class="filter-btn" onclick="setFilter('أحذية',this)">أحذية</button>
+            <button class="filter-btn" onclick="setFilter('إكسسوارات',this)">إكسسوارات</button>
+            <button class="btn-outfit" onclick="suggestOutfit()">✨ اقترح لي طقماً</button>
+        </div>
+    </div>
+
+    <div id="clothesGrid" class="clothes-grid"></div>
+</div>
+
+<!-- نافذة الطقم المقترح -->
+<div id="outfitModal" class="modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal-content">
+        <h2 style="margin-bottom:10px;color:var(--neon-3)">✨ طقمك المقترح لليوم</h2>
+        <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:15px">
+            تم الاختيار من القطع الجاهزة للارتداء فقط
+        </p>
+        <div id="outfitResult"></div>
+        <button class="btn-glow btn-glow-full"
+                onclick="closeModal()">حسناً 👍</button>
+    </div>
+</div>
+
+<script>
+"use strict";
+
+// ======================================================
+//  قاعدة البيانات
+// ======================================================
+let db, allItems = [], currentFilter = 'الكل';
+
+(function initDB() {
+    const req = indexedDB.open("SmartWardrobeDB", 1);
+
+    req.onupgradeneeded = function(e) {
+        const d = e.target.result;
+        if (!d.objectStoreNames.contains("clothes"))
+            d.createObjectStore("clothes", { keyPath:"id", autoIncrement:true });
+    };
+
+    req.onsuccess = function(e) {
+        db = e.target.result;
+        loadClothes();
+    };
+
+    req.onerror = function(e) {
+        document.getElementById("clothesGrid").innerHTML =
+            `<div class="empty-state">
+                <div class="empty-icon">⚠️</div>
+                <p>تعذّر فتح قاعدة البيانات. تأكدي من السماح بالتخزين في المتصفح.</p>
+             </div>`;
+        console.error("IndexedDB error:", e.target.error);
+    };
+})();
+
+// ======================================================
+//  تحويل صورة → Base64
+// ======================================================
+function toBase64(file) {
+    return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.readAsDataURL(file);
+        r.onload  = () => resolve(r.result);
+        r.onerror = err => reject(err);
+    });
+}
+
+// ======================================================
+//  إضافة قطعة جديدة
+// ======================================================
+document.getElementById("clothForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const btn = this.querySelector(".btn-glow");
+    btn.disabled = true;
+    btn.textContent = "⏳ جاري الحفظ...";
+
+    try {
+        const fileInput = document.getElementById("imageInput");
+        let imageData = "";
+        if (fileInput.files.length > 0)
+            imageData = await toBase64(fileInput.files[0]);
+
+        const item = {
+            name:      document.getElementById("name").value.trim(),
+            category:  document.getElementById("category").value,
+            season:    document.getElementById("season").value,
+            location:  document.getElementById("location").value.trim(),
+            color:     document.getElementById("color").value,
+            image:     imageData,
+            status:    "جاهز للارتداء",
+            createdAt: new Date().toLocaleDateString("ar-IQ")
+        };
+
+        const tx = db.transaction(["clothes"], "readwrite");
+        tx.objectStore("clothes").add(item);
+        tx.oncomplete = () => {
+            this.reset();
+            document.getElementById("color").value = "#00d2ff";
+            btn.disabled = false;
+            btn.textContent = "+ حفظ في الخزانة";
+            loadClothes();
+        };
+    } catch(err) {
+        btn.disabled = false;
+        btn.textContent = "+ حفظ في الخزانة";
+        alert("حدث خطأ أثناء الحفظ: " + err.message);
+    }
+});
+
+// ======================================================
+//  قراءة البيانات — مع onerror handler
+// ======================================================
+function loadClothes() {
+    const tx  = db.transaction(["clothes"], "readonly");
+    const req = tx.objectStore("clothes").getAll();
+    req.onsuccess = function() {
+        allItems = req.result.reverse();
+        updateStats();
+        renderClothes();
+    };
+    req.onerror = function(e) {
+        console.error("خطأ في قراءة البيانات:", e.target.error);
+    };
+}
+
+// ======================================================
+//  إحصائيات
+// ======================================================
+function updateStats() {
+    document.getElementById("stat-total").textContent  = allItems.length;
+    document.getElementById("stat-ready").textContent  = allItems.filter(i=>i.status==="جاهز للارتداء").length;
+    document.getElementById("stat-wash").textContent   = allItems.filter(i=>i.status==="في الغسيل").length;
+    document.getElementById("stat-stored").textContent = allItems.filter(i=>i.status==="مخزن").length;
+}
+
+// ======================================================
+//  تبديل الحالة — إصلاح: put() داخل onsuccess قبل إغلاق transaction
+// ======================================================
+function toggleStatus(id, current) {
+    const list  = ["جاهز للارتداء","في الغسيل","مخزن"];
+    const next  = list[(list.indexOf(current) + 1) % list.length];
+    const tx    = db.transaction(["clothes"], "readwrite");
+    const store = tx.objectStore("clothes");
+    const req   = store.get(id);
+
+    req.onsuccess = function() {
+        if (!req.result) return;
+        const data = req.result;
+        data.status = next;
+        store.put(data); // يبقى داخل نفس الـ transaction قبل إغلاقه
+    };
+
+    tx.oncomplete = loadClothes;
+
+    tx.onerror = function(e) {
+        console.error("خطأ في تغيير الحالة:", e.target.error);
+        alert("تعذّر تغيير الحالة، حاولي مرة أخرى.");
+    };
+}
+
+// ======================================================
+//  حذف قطعة — مع onerror handler
+// ======================================================
+function deleteCloth(id, name) {
+    if (!confirm(`هل أنتِ متأكدة من حذف "${name}"؟`)) return;
+    const tx = db.transaction(["clothes"], "readwrite");
+    tx.objectStore("clothes").delete(id);
+    tx.oncomplete = loadClothes;
+    tx.onerror = function(e) {
+        console.error("خطأ في الحذف:", e.target.error);
+        alert("تعذّر حذف القطعة، حاولي مرة أخرى.");
+    };
+}
+
+// ======================================================
+//  فلترة وبحث
+// ======================================================
+function setFilter(cat, btn) {
+    currentFilter = cat;
+    document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderClothes();
+}
+
+document.getElementById("searchInput").addEventListener("input", renderClothes);
+
+// ======================================================
+//  عرض البطاقات
+// ======================================================
+function renderClothes() {
+    const grid   = document.getElementById("clothesGrid");
+    const search = document.getElementById("searchInput").value.trim().toLowerCase();
+
+    const list = allItems.filter(item => {
+        const matchCat    = currentFilter === "الكل" || item.category === currentFilter;
+        const matchSearch = !search ||
+            item.name.toLowerCase().includes(search)     ||
+            item.location.toLowerCase().includes(search) ||
+            item.category.toLowerCase().includes(search) ||
+            item.season.toLowerCase().includes(search);
+        return matchCat && matchSearch;
+    });
+
+    if (list.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">👗</div>
+                <p>${allItems.length === 0
+                    ? "خزانتك فارغة! ابدئي بإضافة قطعة ملابس أولى."
+                    : "لا توجد نتائج مطابقة للبحث أو الفلتر."}</p>
+            </div>`;
+        return;
+    }
+
+    const statusClass = {
+        "جاهز للارتداء":"status-ready",
+        "في الغسيل":    "status-wash",
+        "مخزن":         "status-stored"
+    };
+    const statusIcon = {
+        "جاهز للارتداء":"✅",
+        "في الغسيل":    "🧺",
+        "مخزن":         "📦"
+    };
+
+    grid.innerHTML = list.map((item, i) => {
+        const cls      = statusClass[item.status] || "status-ready";
+        const icon     = statusIcon[item.status]  || "✅";
+        // إصلاح: استخدام data-id و data-status بدل inline string لتجنب كسر onclick
+        const safeName = item.name.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+        const imgHTML = item.image
+            ? `<img class="card-img" src="${item.image}" alt="${safeName}" loading="lazy">`
+            : `<div class="card-img-placeholder">
+                   <div class="placeholder-icon">👕</div>
+                   <span>لا توجد صورة</span>
+               </div>`;
+
+        return `
+        <div class="cloth-card" style="animation-delay:${i*0.05}s">
+            ${imgHTML}
+            <div class="card-header">
+                <span class="card-title">${item.name}</span>
+                <div class="color-dot" style="background:${item.color}" title="${item.color}"></div>
+            </div>
+            <div class="badges">
+                <span class="badge">📂 ${item.category}</span>
+                <span class="badge">🌤️ ${item.season}</span>
+                <span class="badge">📅 ${item.createdAt}</span>
+            </div>
+            <div class="location-box">📍 ${item.location}</div>
+            <div class="card-actions">
+                <button class="btn-status ${cls}"
+                        data-id="${item.id}"
+                        data-status="${item.status}"
+                        onclick="toggleStatus(+this.dataset.id, this.dataset.status)"
+                        title="اضغطي للتبديل">
+                    ${icon} ${item.status}
+                </button>
+                <button class="btn-delete"
+                        data-id="${item.id}"
+                        data-name="${safeName}"
+                        onclick="deleteCloth(+this.dataset.id, this.dataset.name)">🗑️</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ======================================================
+//  اقتراح طقم
+// ======================================================
+function suggestOutfit() {
+    const ready   = allItems.filter(i=>i.status==="جاهز للارتداء");
+    const cats    = ["علوي","سفلي","معاطف","أحذية","إكسسوارات"];
+    const suggest = cats
+        .map(cat => {
+            const pool = ready.filter(i=>i.category===cat);
+            return pool.length ? pool[Math.floor(Math.random()*pool.length)] : null;
+        })
+        .filter(Boolean);
+
+    const el = document.getElementById("outfitResult");
+
+    if (suggest.length === 0) {
+        el.innerHTML = `<div class="outfit-no-items">
+            لا توجد قطع جاهزة للارتداء حالياً!<br>
+            غيّري حالة بعض القطع إلى "جاهز للارتداء" أولاً.
+        </div>`;
+    } else {
+        el.innerHTML = suggest.map(item=>`
+            <div class="outfit-item">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <div class="outfit-dot" style="background:${item.color}"></div>
+                    <div style="text-align:right">
+                        <strong>${item.name}</strong>
+                        <small style="display:block;color:var(--text-muted)">
+                            ${item.category} · ${item.season}
+                        </small>
+                    </div>
+                </div>
+                <span style="color:var(--text-muted);font-size:.8rem">📍 ${item.location}</span>
+            </div>`).join('');
+    }
+
+    document.getElementById("outfitModal").classList.add("show");
+}
+
+function closeModal() {
+    document.getElementById("outfitModal").classList.remove("show");
+}
+
+document.addEventListener("keydown", e => { if(e.key==="Escape") closeModal(); });
+</script>
+</body>
+</html>
